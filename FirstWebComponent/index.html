@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slider Web Component Example</title>
+    <script>
+        class Slider extends HTMLElement {
+            connectedCallback() {
+                this.innerHTML = '<div class="bg-overlay"></div><div class="thumb"></div>';
+
+                this.style.display = 'inline-block';
+                this.style.position = 'relative';
+                this.style.width = '500px';
+                this.style.height = '50px';
+
+                let backgroundColor = this.getAttribute('backgroundcolor');
+                if(backgroundColor == null) {
+                    backgroundColor = 'red';
+                }
+                const bgOverlayStyle = this.querySelector('.bg-overlay').style;
+                bgOverlayStyle.width = '100%';
+                bgOverlayStyle.height = '100%';
+                bgOverlayStyle.position = 'absolute';
+                //bgOverlayStyle.backgroundColor = 'red';
+                bgOverlayStyle.backgroundColor = backgroundColor;
+
+                let marginLeft = this.getAttribute('value');
+                if(marginLeft == null) {
+                    marginLeft = '100';
+                }
+                const thumbStyle = this.querySelector('.thumb').style;
+                //thumbStyle.marginLeft = '100px';
+                thumbStyle.marginLeft = marginLeft + 'px';
+                thumbStyle.width = '5px';
+                thumbStyle.height = 'calc(100% - 5px)';
+                thumbStyle.position = 'absolute';
+                thumbStyle.border = '3px solid white';
+                thumbStyle.borderRadius = '3px';
+            }
+        }
+
+        if (!customElements.get('wcia-slider')) {
+            customElements.define('wcia-slider', Slider);
+        }
+    </script>
+</head>
+<body>
+    <wcia-slider></wcia-slider>
+    <br>
+    <wcia-slider onclick="alert('clicked')"></wcia-slider>
+    <br>
+    <wcia-slider backgroundcolor="#0000ff" value="180"></wcia-slider>
+</body>
+</html>
