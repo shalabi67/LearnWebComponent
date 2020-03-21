@@ -1,0 +1,175 @@
+<!--
+This slider will have two attributes
+1- value—The current percentage value of the slider from 0–100
+2- backgroundcolor—A hexadecimal color of the topmost background layer
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slider using CSS</title>
+
+    <script>
+        class Slider extends HTMLElement {
+            static get valueName() { return 'value';}
+            static get backgroundColorName() { return 'backgroundcolor';}
+
+            connectedCallback() {
+                this.innerHTML =
+                    '<div class="bg-overlay"></div><div class="thumb"></div>';
+
+                //adding mouse listener
+                document.addEventListener('mousemove', e => this.eventHandler(e));
+                document.addEventListener('mouseup', e => this.eventHandler(e));
+                this.addEventListener('mousedown', e => this.eventHandler(e));
+
+                //initalize attributes
+                this.setColor(this.backgroundcolor);
+                this.refreshSlider(this.value);
+            }
+            static get observedAttributes() {
+                return [Slider.valueName, Slider.backgroundColorName];
+            }
+
+            attributeChangedCallback(name, oldVal, newValue) {
+                switch (name) {
+                    case Slider.valueName:
+                        this.refreshSlider(newValue);
+                        break;
+
+                    case Slider.backgroundColorName:
+                        this.setColor(newValue);
+                        break;
+                }
+            }
+
+            set value(val) {
+                this.setAttribute(Slider.valueName, val);
+            }
+
+            get value() {
+                return this.getAttribute(Slider.valueName);
+            }
+
+            set backgroundcolor(val) {
+                this.setAttribute(Slider.backgroundColorName, val);
+            }
+
+            get backgroundcolor() {
+                return this.getAttribute(Slider.backgroundColorName);
+            }
+
+            setColor(color) {
+                if (this.querySelector('.bg-overlay')) {
+                    this.querySelector('.bg-overlay').style.background =
+                        `linear-gradient(to right, ${color} 0%, ${color}00 100%)`;
+                }
+            }
+
+            refreshSlider(value) {
+                if (this.querySelector('.thumb')) {
+                    this.querySelector('.thumb').style.left = (value/100 *
+                        this.offsetWidth - this.querySelector('.thumb').offsetWidth/2)
+                        + 'px';
+                }
+            }
+
+            // mouse events
+            updateX(x) {
+                //Offsets the horizontal position to use the center of the thumbnail
+                let hPos = x - this.querySelector('.thumb') .offsetWidth/2;
+
+                //Restricts horizontal position to confines of component bounds
+                if (hPos > this.offsetWidth) {
+                    hPos = this.offsetWidth;
+                }
+                if (hPos < 0) {
+                    hPos = 0;
+                }
+
+                //Calculates the percentage horizontal position and sets the value attribute through the setter API
+                this.value = (hPos / this.offsetWidth) * 100;
+            }
+
+            eventHandler(e) {
+                //Calculates horizontal position relative to left edge of the component
+                const bounds = this.getBoundingClientRect();
+                const x = e.clientX - bounds.left;
+
+                switch (e.type) {
+                    //On mousedown, sets a boolean to indicate the user is dragging, updates the “value” attribute, and updates the slider position
+                    case 'mousedown':
+                        this.isDragging = true;
+                        this.updateX(x);
+                        this.refreshSlider(this.value);
+                        break;
+
+                    //On mouseup, sets the boolean to false to indicate the user is no longer dragging
+                    case 'mouseup':
+                        this.isDragging = false;
+                        break;
+
+                    // On mousemove, if the boolean indicates the user is dragging, updates the “value” attribute and updates the slider position
+                    case 'mousemove':
+                        if (this.isDragging) {
+                            this.updateX(x);
+                            this.refreshSlider(this.value);
+                        }
+                        break;
+                }
+            }
+        }
+
+        if (!customElements.get('wcia-slider')) {
+            customElements.define('wcia-slider', Slider);
+        }
+
+    </script>
+
+    <style>
+    wcia-slider {
+        display: inline-block;
+        position: relative;
+        border-radius: 3px;
+        height: 50px;
+        width: 500px;
+        background-image: linear-gradient(45deg, #ccc 25%,
+        transparent 25%),linear-gradient(-45deg, #ccc 25%,
+        transparent 25%),linear-gradient(45deg, transparent 75%,
+        #ccc 75%),linear-gradient(-45deg, transparent 75%, #ccc 75%);
+        background-size: 16px 16px;
+        background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    }
+
+    .bg-overlay {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        border-radius: 3px;
+        background: linear-gradient(to right, #ff0000 0%, #ff000000 100%);
+    }
+
+    .thumb {
+        margin-top: -1px;
+        left: 250px;
+        width: 5px;
+        height: calc(100% - 5px);
+        position: absolute;
+        border-style: solid;
+        border-width: 3px;
+        border-color: white;
+        border-radius: 3px;
+        pointer-events: none;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+    }
+
+    </style>
+</head>
+<body>
+    <wcia-slider value="90" backgroundcolor="#0000ff"></wcia-slider>
+    <br>
+    <wcia-slider value="30" backgroundcolor="#00ff00"></wcia-slider>
+</body>
+</html>

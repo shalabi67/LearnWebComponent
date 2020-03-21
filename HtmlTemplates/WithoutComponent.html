@@ -1,0 +1,43 @@
+<!--
+To use Html templates we need to do the following:
+1- create a block of html and store it on <template> tag.
+2- copy template into javascript variable using importNode.
+3- append variable to any element in html.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Html Template with just html</title>
+</head>
+<body>
+    <!-- 1- create a block of html and store it on <template> tag. -->
+    <template id="card-template">
+        <p>
+            <span class="title"></span>
+            :
+            <span class="subtitle"></span>
+        </p>
+    </template>
+    <div id="cards"></div>
+
+    <script>
+        const cardTemplate = document.getElementById('card-template');
+        const titles = [
+            {title: "title 1", subTitle: "sub 1"},
+            {title: "title 2", subTitle: "sub 2"},
+            {title: "title 3", subTitle: "sub 3"},
+        ];
+
+        titles.forEach(title => {
+            // 2- copy template into javascript variable using importNode.
+            const htmlNode = document.importNode(cardTemplate.content, true);
+            htmlNode.querySelector('.title').innerHTML = title.title;
+            htmlNode.querySelector('.subtitle').innerHTML = title.subTitle;
+
+            // 3- append variable to any element in html.
+            document.getElementById("cards").appendChild(htmlNode);
+        })
+    </script>
+</body>
+</html>

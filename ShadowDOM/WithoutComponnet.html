@@ -1,0 +1,41 @@
+<!--
+To create shadow we need to:
+1- attach a shadow.
+2- create content and style to shadow.
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>How to do shadow dom in html</title>
+    <style>
+        h1 {
+            background: blue;
+            color: #000;
+        }
+    </style>
+    <script>
+        //shadow content and style.
+        const style = `<style>
+            h1 {
+                background: red;
+                color: #fff;
+            }
+        </style>`;
+        const content = `<h1>SHADOW: This will have red background comming from style defined in shadow.</h1>`;
+    </script>
+</head>
+<body>
+    <div id="myShadow"></div>
+    <h1>NO SHADOW: This will not have blue background comming from style defined in header.</h1>
+
+    <script>
+        // attach a shadow
+        const myShadowRoot = document.getElementById("myShadow").attachShadow({mode: "open"});
+
+        // create content and style to shadow.
+        myShadowRoot.innerHTML = `${style}${content}`;
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!--
+This is the starting point component, This component search of 3d images define on Google Polly. It uses an API
+which you can get from https://developers.google.com/poly/develop/web.
+We will start modifying  We will start changing this component to do the following
+1- be configurable by having a set of setter and getters
+2- be configurable by using attributes
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Polly Sesarch Web Component First example</title>
+    <script>
+        class PolySearch extends HTMLElement {
+            connectedCallback() {
+                this.doSearch();
+            }
+
+            doSearch() {
+                if (this._apiKey && this._searchTerm) {
+                    const url = 'https://poly.googleapis.com/v1/assets?keywords=' +
+                        this._searchTerm + '&format=OBJ&key=' + this._apiKey;
+                    const request = new XMLHttpRequest();
+                    request.open( 'GET', url, true );
+                    request.addEventListener( 'load', (event) => {
+                        this.renderResults(JSON.parse( event.target.response ).assets);
+                    });
+                    request.send();
+                }
+            }
+
+            set apiKey(value) {
+                this._apiKey = value;
+                this.doSearch();
+            }
+
+            get searchTerm() {
+                return this._searchTerm;
+            }
+
+            set searchTerm(value) {
+                this._searchTerm = value;
+                this.doSearch();
+            }
+
+            /*
+            renderResults(assets) {
+                for (let c = 0; c < assets.length; c++) {
+                    const img = document.createElement('img');
+                    img.src = assets[c].thumbnail.url;
+                    this.appendChild(img);
+                }
+            }
+             */
+            /*+
+            This approach is better than doing a document.createElement:
+            I personally like the string approach for these cases better. You can create a big chunk of HTML and have it hit your DOM at the same time,
+            rather than having one element per loop iteration. Also, HTML is a bit easier to read, especially when we get into template literals later on.
+            A big downside to creating each element one by one in the loop is that with each one, you are causing the browser to re-parse and re-render that entire block.
+            The same would happen if you were adding each image one at a time and setting innerHTML after each.
+            It will likely be better to stick with an HTML string that gets built up over time and then set all at once to innerHTML.
+             */
+            renderResults(assets) {
+                let html = '';
+                for (let c = 0; c < assets.length; c++) {
+                    html += '<img src="' + assets[c].thumbnail.url + '" width="200" height="150" />';
+                }
+                this.innerHTML = html;
+            }
+        }
+
+        if (!customElements.get('poly-search')) {
+            customElements.define(
+                'poly-search', PolySearch);
+        }
+    </script>
+    <style>
+        poly-search {
+            border-style: solid;   /*  Gives a nice subtle border around our entire element */
+        border-width: 1px;
+            border-color: #9a9a9a;
+            padding: 10px;  /* A gap between the edges of our element and the inner results we are displaying */
+        background-color: #fafafa;  /* A background color to pair with the border, separating the element from the page */
+        display: inline-block;  /* Allows elements to flow horizontally and wrap to the next line when out of room */
+        text-align: center;
+        }
+
+        poly-search img {
+            margin: 5px; /*  Spacing between images */
+
+        }
+    </style>
+</head>
+
+<body>
+    <poly-search></poly-search>
+
+    <script>
+        document.querySelector('poly-search').apiKey = 'AIzaSyANyB5Oe8eq4F1Rx3OgsAW5uV7uwKOpcxk';
+        document.querySelector('poly-search').searchTerm = 'parrot';
+    </script>
+</body>
+</html>
