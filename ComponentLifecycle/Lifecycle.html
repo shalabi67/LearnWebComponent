@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Constructor and connectedCallback lifecycle</title>
+    <script>
+        class MyCustomTag extends HTMLElement {
+            constructor()  {
+                super();
+                alert('hi from MyCustomTags constructor');
+            }
+
+            connectedCallback() {
+                alert('hi from MyCustomTag');
+                this.innerHTML = '<h2>'+ this.getAttribute('title') +
+                    '</h2><button>click me</button>';
+            }
+        }
+
+        if (!customElements.get('my-custom-tag')) {
+            customElements.define('my-custom-tag', MyCustomTag);
+        }
+    </script>
+
+    <style>
+        my-custom-tag {
+            background-color: blue;
+            padding: 20px;
+            display: inline-block;
+            color: white;
+        }
+    </style>
+
+</head>
+<body>
+    <my-custom-tag title="The constructor will be called first then after that the connectedCallback will be called."></my-custom-tag>
+
+    <script>
+        // this will fire the constructor alert
+        x = document.createElement('my-custom-tag');
+        x.setAttribute('title', 'constructor will be fired then connectedCallback will not be fired');
+
+        //this will fire the connectedCallback alert
+        document.body.appendChild(x);
+    </script>
+
+    <script>
+        //Adding the custom component to just any element not yet attached to the DOM will not trigger the connectedCallback method.
+        myEl = document.createElement('my-custom-tag');
+        myEl.setAttribute('title', 'connectedCallback will be called as soon as we add containing <div> to <body>');
+        myContainer = document.createElement('div');
+        myContainer.appendChild(myEl);  // this will not trigger connectedCallback.
+
+        alert('Now let us add the div to dom. as soon as we do that connectedCallback will be called');
+        document.body.appendChild(myContainer);
+    </script>
+</body>
+</html>

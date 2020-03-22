@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DisconnectedCallback</title>
+
+    <script>
+        class CleanupComponent extends HTMLElement {
+            connectedCallback() {
+                this.counter = 100;
+                this.timer = setInterval( () =>
+                    this.update(), 1000); // Starts the countdown timer
+            }
+
+            disconnectedCallback() {
+                clearInterval(this.timer); // When component is removed (on disconnectedCallback), removes the timer
+            }
+
+            update() {
+                this.innerHTML = this.counter;
+                this.counter --;
+                console.log(this.counter); // Console logs the current timer value (still running after component is removed!)
+            }
+        }
+
+        customElements.define('cleanup-component', CleanupComponent);
+    </script>
+</head>
+<body>
+    <cleanup-component></cleanup-component>
+    <!--    Button to remove the component   -->
+    <button onclick="document.body.removeChild(document.querySelector('cleanup-component'))">remove</button>
+
+</body>
+</html>
